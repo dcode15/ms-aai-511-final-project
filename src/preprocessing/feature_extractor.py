@@ -45,7 +45,7 @@ class FeatureExtractor:
         return features, MultidimensionalFeatureExtractor.extract_features(midi_data)
 
     @staticmethod
-    def extract_features_for_multiple_files(
+    def extract_features_for_directory(
             data_directory: str,
             composers: List[str],
             sampling_frequency: int = 10,
