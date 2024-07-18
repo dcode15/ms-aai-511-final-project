@@ -1,5 +1,6 @@
 import os
 import pickle
+import traceback
 from typing import Dict, Any, List, Tuple
 
 import numpy as np
@@ -86,8 +87,11 @@ class FeatureExtractor:
                     scalar_features['composer'] = composer
                     all_scalar_features.append(scalar_features)
                     all_multidimensional_features.append(multidimensional_features)
-                except:
+                except Exception as e:
                     print(f"Failed to process file {os.path.basename(midi_file)}.")
+                    print(f"Error message: {str(e)}")
+                    print("Stack trace:")
+                    traceback.print_exc()
 
                 pbar.update(1)
 
@@ -101,7 +105,8 @@ class FeatureExtractor:
     @staticmethod
     def _get_midi_files(data_directory: str, composers: List[str]) -> List[Tuple[str, str]]:
         """
-        Retrieves all MIDI files for the specified composers from the given directory.
+        Retrieves all MIDI files for the specified composers from the given directory. The method searches for files
+        with '.mid' or '.midi' extensions in the specified composer directories and their subdirectories.
 
         Args:
             data_directory (str): Root directory containing composer subdirectories.
@@ -111,10 +116,6 @@ class FeatureExtractor:
             List[Tuple[str, str]]: A list of tuples, each containing:
                 - The full path to a MIDI file.
                 - The name of the composer.
-
-        Note:
-            This method searches for files with '.mid' or '.midi' extensions (case-insensitive)
-            in the specified composer directories and their subdirectories.
         """
         midi_files = []
         for composer in composers:
