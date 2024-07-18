@@ -3,8 +3,24 @@ import pretty_midi
 
 
 class TextureFeatureExtractor:
+
     @staticmethod
     def extract_features(midi_data: pretty_midi.PrettyMIDI, time_step: float = 0.1):
+        """
+        Extracts texture-related features from the given MIDI data.
+
+        Args:
+            midi_data (pretty_midi.PrettyMIDI): The MIDI data to analyze.
+            time_step (float, optional): The time step for analysis. Defaults to 0.1 seconds.
+
+        Returns:
+            dict: A dictionary containing the extracted features:
+                - max_independent_voices: The maximum number of unique pitches sounding simultaneously.
+                - avg_independent_voices: The average number of unique pitches sounding simultaneously.
+                - var_independent_voices: The standard deviation of the number of unique pitches sounding simultaneously.
+                - avg_simultaneity: The average number of notes sounding simultaneously.
+                - var_simultaneity: The standard deviation of the number of notes sounding simultaneously.
+        """
         notes = [note for instrument in midi_data.instruments for note in instrument.notes]
         notes.sort(key=lambda x: x.start)
 

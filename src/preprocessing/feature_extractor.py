@@ -16,8 +16,21 @@ from src.preprocessing.texture_feature_extractor import TextureFeatureExtractor
 
 
 class FeatureExtractor:
+
     @staticmethod
     def extract_features(midi_file: str, time_step: float = 0.1) -> Tuple[Dict[str, Any], Dict[str, np.ndarray]]:
+        """
+        Extracts scalar and multidimensional features from a single MIDI file.
+
+        Args:
+            midi_file (str): Path to the MIDI file.
+            time_step (float, optional): Time step for feature extraction. Defaults to 0.1 seconds.
+
+        Returns:
+            Tuple[Dict[str, Any], Dict[str, np.ndarray]]: A tuple containing:
+                - A dictionary of scalar features.
+                - A dictionary of multidimensional features.
+        """
         features: Dict[str, Any] = {}
         midi_data = pretty_midi.PrettyMIDI(midi_file)
 
@@ -36,6 +49,21 @@ class FeatureExtractor:
             composers: List[str],
             sampling_frequency: int = 10,
     ) -> Tuple[pd.DataFrame, List[Dict[str, np.ndarray]]]:
+        """
+        Extracts features from multiple MIDI files for specified composers. This method caches the extracted features to
+        a file named "extracted_features.pkl" in the data directory. If this file exists, it will load the features from
+        the file instead of reprocessing the MIDI files.
+
+        Args:
+            data_directory (str): Root directory containing composer subdirectories with MIDI files.
+            composers (List[str]): List of composer names to process.
+            sampling_frequency (int, optional): Sampling frequency for feature extraction. Defaults to 10 Hz.
+
+        Returns:
+            Tuple[pd.DataFrame, List[Dict[str, np.ndarray]]]: A tuple containing:
+                - A DataFrame of scalar features for all processed MIDI files.
+                - A list of dictionaries containing multidimensional features for all processed MIDI files.
+        """
         time_step: float = 1 / sampling_frequency
         output_file = os.path.join(data_directory, "extracted_features.pkl")
 
@@ -52,11 +80,14 @@ class FeatureExtractor:
             for midi_file, composer in midi_files:
                 pbar.set_postfix_str(f"Processing: {os.path.basename(midi_file)}")
 
-                scalar_features, multidimensional_features = FeatureExtractor.extract_features(midi_file, time_step)
-                scalar_features['file_name'] = os.path.basename(midi_file)
-                scalar_features['composer'] = composer
-                all_scalar_features.append(scalar_features)
-                all_multidimensional_features.append(multidimensional_features)
+                try:
+                    scalar_features, multidimensional_features = FeatureExtractor.extract_features(midi_file, time_step)
+                    scalar_features['file_name'] = os.path.basename(midi_file)
+                    scalar_features['composer'] = composer
+                    all_scalar_features.append(scalar_features)
+                    all_multidimensional_features.append(multidimensional_features)
+                except:
+                    print(f"Failed to process file {os.path.basename(midi_file)}.")
 
                 pbar.update(1)
 
@@ -68,7 +99,23 @@ class FeatureExtractor:
         return scalar_df, all_multidimensional_features
 
     @staticmethod
-    def _get_midi_files(data_directory: str, composers: List[str]) -> List[tuple[str, str]]:
+    def _get_midi_files(data_directory: str, composers: List[str]) -> List[Tuple[str, str]]:
+        """
+        Retrieves all MIDI files for the specified composers from the given directory.
+
+        Args:
+            data_directory (str): Root directory containing composer subdirectories.
+            composers (List[str]): List of composer names to process.
+
+        Returns:
+            List[Tuple[str, str]]: A list of tuples, each containing:
+                - The full path to a MIDI file.
+                - The name of the composer.
+
+        Note:
+            This method searches for files with '.mid' or '.midi' extensions (case-insensitive)
+            in the specified composer directories and their subdirectories.
+        """
         midi_files = []
         for composer in composers:
             composer_dir = os.path.join(data_directory, composer)

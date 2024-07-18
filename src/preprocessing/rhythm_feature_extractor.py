@@ -3,8 +3,24 @@ import pretty_midi
 
 
 class RhythmFeatureExtractor:
+
     @staticmethod
     def extract_features(midi_data: pretty_midi.PrettyMIDI):
+        """
+        Extracts rhythm-related features from the given MIDI data.
+
+        Args:
+            midi_data (pretty_midi.PrettyMIDI): The MIDI data to analyze.
+
+        Returns:
+            dict: A dictionary containing the extracted features:
+                - note_density: The number of notes per unit of time.
+                - avg_note_duration: The mean duration of all notes.
+                - var_note_duration: The standard deviation of note durations.
+                - initial_tempo: The estimated tempo of the MIDI file.
+                - time_signature_numerator: The numerator of the initial time signature (if available, otherwise None).
+                - time_signature_denominator: The denominator of the initial time signature (if available, otherwise None).
+        """
         notes = [note for instrument in midi_data.instruments for note in instrument.notes]
 
         # Note Density

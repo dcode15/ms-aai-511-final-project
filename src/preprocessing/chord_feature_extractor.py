@@ -5,8 +5,27 @@ import pretty_midi
 
 
 class ChordFeatureExtractor:
+
     @staticmethod
     def extract_features(midi_data: pretty_midi.PrettyMIDI, time_step: float = 0.1) -> Dict[str, float]:
+        """
+        Extracts chord-related features from the given MIDI data.
+
+        Args:
+            midi_data (pretty_midi.PrettyMIDI): The MIDI data to analyze.
+            time_step (float, optional): The time step for analysis. Defaults to 0.1.
+
+        Returns:
+            Dict[str, float]: A dictionary containing the extracted features:
+                - avg_simultaneous_pitch_classes: Average number of simultaneous pitch classes.
+                - perfect_vertical_intervals: Proportion of perfect intervals (unisons, fourths, fifths, octaves).
+                - vertical_minor_seconds: Proportion of minor second intervals.
+                - vertical_thirds: Proportion of major and minor third intervals.
+                - vertical_fifths: Proportion of perfect fifth intervals.
+                - vertical_tritones: Proportion of tritone intervals.
+                - vertical_octaves: Proportion of octave intervals.
+                - avg_chord_duration: Average duration of chords.
+        """
         end_time: float = midi_data.get_end_time()
         time_points: np.ndarray = np.arange(0, end_time, time_step)
 

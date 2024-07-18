@@ -6,8 +6,24 @@ import pretty_midi
 
 
 class MelodicFeatureExtractor:
+
     @staticmethod
     def extract_features(midi_data: pretty_midi.PrettyMIDI) -> Dict[str, float]:
+        """
+        Extracts melodic features from the given MIDI data. If there are no intervals (i.e., less than two notes), all
+        features will be set to 0.
+
+        Args:
+            midi_data (pretty_midi.PrettyMIDI): The MIDI data to analyze.
+
+        Returns:
+            Dict[str, float]: A dictionary containing the extracted features:
+                - average_melodic_interval: The mean absolute interval between consecutive notes.
+                - most_common_melodic_interval: The most frequently occurring absolute interval.
+                - amount_of_arpeggiation: The proportion of intervals that are part of common arpeggios.
+                - stepwise_motion: The proportion of intervals that are whole steps or half steps.
+                - direction_of_motion: The proportion of rising intervals, representing melodic direction.
+        """
         notes: List[pretty_midi.Note] = sorted(
             [note for instrument in midi_data.instruments for note in instrument.notes],
             key=lambda x: x.start
