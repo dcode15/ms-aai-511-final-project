@@ -1,5 +1,4 @@
-from collections import defaultdict
-from typing import Dict, List, Set, Tuple
+from typing import Dict, List, Set
 
 import numpy as np
 import pretty_midi
