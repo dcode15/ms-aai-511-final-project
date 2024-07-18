@@ -7,12 +7,12 @@ import pandas as pd
 import pretty_midi
 from tqdm import tqdm
 
-from chord_feature_extractor import ChordFeatureExtractor
-from melodic_feature_extractor import MelodicFeatureExtractor
-from multidimensional_feature_extractor import MultidimensionalFeatureExtractor
-from pitch_feature_extractor import PitchFeatureExtractor
-from rhythm_feature_extractor import RhythmFeatureExtractor
-from texture_feature_extractor import TextureFeatureExtractor
+from src.preprocessing.chord_feature_extractor import ChordFeatureExtractor
+from src.preprocessing.melodic_feature_extractor import MelodicFeatureExtractor
+from src.preprocessing.multidimensional_feature_extractor import MultidimensionalFeatureExtractor
+from src.preprocessing.pitch_feature_extractor import PitchFeatureExtractor
+from src.preprocessing.rhythm_feature_extractor import RhythmFeatureExtractor
+from src.preprocessing.texture_feature_extractor import TextureFeatureExtractor
 
 
 class FeatureExtractor:
@@ -26,6 +26,7 @@ class FeatureExtractor:
         features.update(PitchFeatureExtractor.extract_features(midi_data))
         features.update(MelodicFeatureExtractor.extract_features(midi_data))
         features.update(ChordFeatureExtractor.extract_features(midi_data, time_step))
+        features["length"] = midi_data.get_end_time()
 
         return features, MultidimensionalFeatureExtractor.extract_features(midi_data)
 
@@ -34,14 +35,14 @@ class FeatureExtractor:
             data_directory: str,
             composers: List[str],
             sampling_frequency: int = 10,
-    ) -> Tuple[pd.DataFrame, Dict[str, np.ndarray]]:
+    ) -> Tuple[pd.DataFrame, List[Dict[str, np.ndarray]]]:
         time_step: float = 1 / sampling_frequency
         output_file = os.path.join(data_directory, "extracted_features.pkl")
 
         if os.path.exists(output_file):
             print(f"Loading existing features from {output_file}")
-            with open(output_file, 'rb') as f:
-                return pickle.load(f)
+            with open(output_file, 'rb') as processed_data_file:
+                return pickle.load(processed_data_file)
 
         all_scalar_features = []
         all_multidimensional_features = []
@@ -56,17 +57,15 @@ class FeatureExtractor:
                 scalar_features['composer'] = composer
                 all_scalar_features.append(scalar_features)
                 all_multidimensional_features.append(multidimensional_features)
-                if len(all_scalar_features) >= 30:
-                    break
 
                 pbar.update(1)
 
-        df = pd.DataFrame(all_scalar_features)
-        with open(output_file, 'wb') as f:
-            pickle.dump(df, f)
+        scalar_df = pd.DataFrame(all_scalar_features)
+        with open(output_file, 'wb') as processed_data_file:
+            pickle.dump((scalar_df, all_multidimensional_features), processed_data_file)
         print(f"Saved extracted features to {output_file}")
 
-        return df, all_multidimensional_features
+        return scalar_df, all_multidimensional_features
 
     @staticmethod
     def _get_midi_files(data_directory: str, composers: List[str]) -> List[tuple[str, str]]:
