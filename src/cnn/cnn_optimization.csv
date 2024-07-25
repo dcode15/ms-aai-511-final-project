@@ -1,0 +1,4 @@
+id,use_chroma,seq_length,batch_size,lr,num_epochs,conv1_out_channels,conv2_out_channels,kernel_size,stride,pool_kernel_size,pool_stride,fc1_out,accuracy,bach_f1,beethoven_f1,chopin_f1,mozart_f1
+1,1,50,8,0.001,1,32,64,3,1,2,2,128,0.59,0.78,0.5,0.18,0.06
+2,1,100,8,0.001,1,32,64,3,1,2,2,128,0.57,0.76,0.4,0.2,0.31
+3,1,200,8,0.001,1,32,64,3,1,2,2,128,0.56,0.74,0.49,0.25,0.22
