@@ -19,7 +19,7 @@ from src.preprocessing.texture_feature_extractor import TextureFeatureExtractor
 class FeatureExtractor:
 
     @staticmethod
-    def extract_features(midi_file: str, time_step: float = 0.1) -> Tuple[Dict[str, Any], Dict[str, np.ndarray]]:
+    def extract_features(midi_data: pretty_midi.PrettyMIDI, time_step: float = 0.1) -> Tuple[Dict[str, Any], Dict[str, np.ndarray]]:
         """
         Extracts scalar and multidimensional features from a single MIDI file.
 
@@ -33,7 +33,6 @@ class FeatureExtractor:
                 - A dictionary of multidimensional features.
         """
         features: Dict[str, Any] = {}
-        midi_data = pretty_midi.PrettyMIDI(midi_file)
 
         features.update(TextureFeatureExtractor.extract_features(midi_data, time_step))
         features.update(RhythmFeatureExtractor.extract_features(midi_data))
@@ -82,7 +81,8 @@ class FeatureExtractor:
                 pbar.set_postfix_str(f"Processing: {os.path.basename(midi_file)}")
 
                 try:
-                    scalar_features, multidimensional_features = FeatureExtractor.extract_features(midi_file, time_step)
+                    midi_data = pretty_midi.PrettyMIDI(midi_file)
+                    scalar_features, multidimensional_features = FeatureExtractor.extract_features(midi_data, time_step)
                     scalar_features['file_name'] = os.path.basename(midi_file)
                     scalar_features['composer'] = composer
                     all_scalar_features.append(scalar_features)
