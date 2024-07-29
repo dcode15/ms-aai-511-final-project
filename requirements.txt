@@ -1,5 +1,6 @@
 pretty_midi==0.2.10
 numpy==1.23.5
+optuna==3.6.1
 pandas==2.2.2
 matplotlib==3.8.4
 seaborn==0.13.2
