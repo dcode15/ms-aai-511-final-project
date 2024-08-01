@@ -39,8 +39,6 @@ class DataAugmentor:
                                      sampled_file_name)
             midi_data = DataAugmentor._augment_midi(file_path)
             scalar_features, multidimensional_features = FeatureExtractor.extract_features(midi_data)
-            scalar_features['file_name'] = sampled_file_name
-            scalar_features['composer'] = sampled_file_composer
             all_scalar_features.append(scalar_features)
             all_multidimensional_features.append(multidimensional_features)
 
